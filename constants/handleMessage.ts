@@ -10,6 +10,7 @@ type Props = {
     playerInitialized: boolean;
     setPlayerInitialized: Dispatch<SetStateAction<boolean>>;
     webview: RefObject<WebView>;
+    setFavourite: Dispatch<SetStateAction<boolean>>;
 };
 
 const handleMesssage = async ({
@@ -17,6 +18,7 @@ const handleMesssage = async ({
     playerInitialized,
     setPlayerInitialized,
     webview,
+    setFavourite,
 }: Props) => {
     if (playerInitialized === false) {
         setupPlayer();
@@ -58,6 +60,8 @@ const handleMesssage = async ({
         await TrackPlayer.add(toAdd);
     } else if (data.eventType === "togglePlay") {
         togglePlay();
+    } else if (data.eventType === "favourite-check") {
+        setFavourite(data.isFavourite);
     }
 };
 

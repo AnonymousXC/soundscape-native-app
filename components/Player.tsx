@@ -1,4 +1,10 @@
-import { RefObject, useEffect, useState } from "react";
+import {
+    Dispatch,
+    RefObject,
+    SetStateAction,
+    useEffect,
+    useState,
+} from "react";
 import {
     Animated,
     Dimensions,
@@ -26,9 +32,11 @@ import Share from "./icons/Share";
 
 type Props = {
     webview: RefObject<WebView>;
+    favourite: boolean;
+    setIsFavourite: Dispatch<SetStateAction<boolean>>;
 };
 
-function Player({ webview }: Props) {
+function Player({ webview, favourite, setIsFavourite }: Props) {
     const songProgress = useProgress();
     const [playing, setPlaying] = useState(false);
     const [song, setSong] = useState<PlaybackActiveTrackChangedEvent>();
@@ -76,7 +84,14 @@ function Player({ webview }: Props) {
                     </Animated.View>
                 </LinearGradient>
                 <View style={{ flex: 1 }}>
-                    <Text style={styles.songName} numberOfLines={1}>
+                    <Text
+                        style={styles.songName}
+                        numberOfLines={1}
+                        onPress={() => {
+                            webview.current?.injectJavaScript(
+                                `window.openSongPage("${song?.track!.id}")`
+                            );
+                        }}>
                         {" "}
                         {song?.track?.title}{" "}
                     </Text>
@@ -128,11 +143,12 @@ function Player({ webview }: Props) {
                     <TouchableOpacity
                         style={styles.metaButton}
                         onPress={() => {
+                            setIsFavourite(!favourite);
                             webview.current?.injectJavaScript(
-                                "window.addFavourite()"
+                                `window.addFavourite("${song?.track!.id}")`
                             );
                         }}>
-                        <Love isActive={false} />
+                        <Love isActive={favourite} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.metaButton} onPress={share}>
                         <Share />

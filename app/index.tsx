@@ -9,6 +9,7 @@ import WebViewContext from "@/contexts/webviewContext";
 export default function Index() {
     const [loaded, setLoaded] = useState(false);
     const [playerInitialized, setPlayerInitialized] = useState(false);
+    const [isFavourite, setIsFavourite] = useState<boolean>(false);
     const webviewRef = createRef<WebView>();
 
     useEffect(() => {
@@ -46,6 +47,7 @@ export default function Index() {
                             playerInitialized,
                             setPlayerInitialized,
                             webview: webviewRef,
+                            setFavourite: setIsFavourite,
                         });
                     }}
                 />
@@ -56,7 +58,11 @@ export default function Index() {
                     }}>
                     <Text>Loading the app...</Text>
                 </View>
-                <Player webview={webviewRef} />
+                <Player
+                    webview={webviewRef}
+                    favourite={isFavourite}
+                    setIsFavourite={setIsFavourite}
+                />
             </View>
         </WebViewContext.Provider>
     );
