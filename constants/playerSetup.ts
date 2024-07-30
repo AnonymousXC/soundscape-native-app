@@ -1,9 +1,11 @@
-import TrackPlayer, { AppKilledPlaybackBehavior, Capability } from "react-native-track-player"
-
+import TrackPlayer, {
+    AppKilledPlaybackBehavior,
+    Capability,
+} from "react-native-track-player";
 
 async function setupPlayer() {
-    TrackPlayer.registerPlaybackService(() => require('./Service'))
-    await TrackPlayer.setupPlayer()
+    TrackPlayer.registerPlaybackService(() => require("./Service"));
+    await TrackPlayer.setupPlayer();
     await TrackPlayer.updateOptions({
         backwardJumpInterval: 10,
         forwardJumpInterval: 10,
@@ -17,9 +19,10 @@ async function setupPlayer() {
             Capability.JumpForward,
         ],
         android: {
-            appKilledPlaybackBehavior: AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification
-        }
-    })
-} 
+            appKilledPlaybackBehavior:
+                AppKilledPlaybackBehavior.StopPlaybackAndRemoveNotification,
+        },
+    });
+}
 
 export default setupPlayer;

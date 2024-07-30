@@ -1,0 +1,9 @@
+/node_modules
+/@types
+/interfaces
+/.next
+/.expo
+
+.env
+.env.*
+*.env.*

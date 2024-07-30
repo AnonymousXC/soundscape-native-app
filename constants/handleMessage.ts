@@ -1,26 +1,34 @@
-import TrackPlayer from "react-native-track-player"
-import WebView, { WebViewMessageEvent } from "react-native-webview"
-import setupPlayer from "./playerSetup"
-import { Dispatch, RefObject, SetStateAction } from "react"
-import { togglePlay } from "./helper"
+import TrackPlayer from "react-native-track-player";
+import WebView, { WebViewMessageEvent } from "react-native-webview";
+import setupPlayer from "./playerSetup";
+import { Dispatch, RefObject, SetStateAction } from "react";
+import { togglePlay } from "./helper";
+import fetchSongSuggestion from "./fetchSuggestions";
 
 type Props = {
-    event: WebViewMessageEvent,
-    playerInitialized: boolean,
-    setPlayerInitialized: Dispatch<SetStateAction<boolean>>,
-    webview: RefObject<WebView>
-}
+    event: WebViewMessageEvent;
+    playerInitialized: boolean;
+    setPlayerInitialized: Dispatch<SetStateAction<boolean>>;
+    webview: RefObject<WebView>;
+};
 
-const handleMesssage = async ({ event, playerInitialized, setPlayerInitialized, webview }: Props) => {
-
+const handleMesssage = async ({
+    event,
+    playerInitialized,
+    setPlayerInitialized,
+    webview,
+}: Props) => {
     if (playerInitialized === false) {
-        setupPlayer()
-        setPlayerInitialized(true)
+        setupPlayer();
+        setPlayerInitialized(true);
     }
 
-    const data = JSON.parse(event.nativeEvent.data)
+    const data = JSON.parse(event.nativeEvent.data);
     if (data.eventType === "newSong") {
-        await TrackPlayer.reset()
+        const activeTrack = await TrackPlayer.getActiveTrack();
+        if (activeTrack?.id === data.id) return;
+
+        await TrackPlayer.reset();
         await TrackPlayer.add({
             title: data.name,
             url: data.downloadUrl[4].link,
@@ -28,31 +36,29 @@ const handleMesssage = async ({ event, playerInitialized, setPlayerInitialized, 
             artwork: data.image[2].link,
             duration: data.duration,
             date: data.releaseDate,
-            id: data.id
-        })
+            id: data.id,
+        });
 
-        await TrackPlayer.play()
+        await TrackPlayer.play();
+        webview.current?.injectJavaScript("window.playSongRN()");
 
-        webview.current?.injectJavaScript("window.playSongRN()")
-    }
-    else if (data.eventType === "togglePlay") {
-        togglePlay()
-    }
-    else if (data.eventType === "songSuggestion") {
-        await TrackPlayer.removeUpcomingTracks()
-        const toAdd = []
+        await TrackPlayer.removeUpcomingTracks();
+        const songSuggestion = (await fetchSongSuggestion(data.id)).data;
+        const toAdd: Array<any> = [];
         for (let index = 0; index < 10; index++) {
-            const element = data[index];
+            const element = songSuggestion[index];
             toAdd.push({
-                url: element.downloadUrl[4].link,
-                artwork: element.image[2].link,
+                url: element.downloadUrl[4].url,
+                artwork: element.image[2].url,
                 title: element.name,
-                artist: element.primaryArtists,
-                id: element.id
-            })
+                artist: element.artists.primary[0].name,
+                id: element.id,
+            });
         }
-        await TrackPlayer.add(toAdd)
+        await TrackPlayer.add(toAdd);
+    } else if (data.eventType === "togglePlay") {
+        togglePlay();
     }
-}
+};
 
 export default handleMesssage;
