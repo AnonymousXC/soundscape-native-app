@@ -15,6 +15,9 @@
                 "EXPO_PUBLIC_SITE_URL": "https://soundscape-psi.vercel.app",
                 "EXPO_PUBLIC_SONG_DEFAULT_IMAGE": "https://i.pinimg.com/736x/34/ed/52/34ed521321f95f3739756671efb97446.jpg",
                 "EXPO_PUBLIC_SONG_BACKEND_URL": "https://soundscape-backend-api.vercel.app/api/songs/"
+            },
+            "android": {
+                "buildType": "apk"
             }
         }
     },
